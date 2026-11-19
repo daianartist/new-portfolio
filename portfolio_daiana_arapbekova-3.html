@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daiana Arapbekova — Backend & Game Developer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg: #F4F3EF;
+      --bg-elevated: #ECEBE6;
+      --fg: #141414;
+      --fg-muted: #6E6E6E;
+      --fg-subtle: #9A9994;
+      --border: rgba(20, 20, 20, 0.11);
+      --border-hover: rgba(20, 20, 20, 0.35);
+      --ascii-rgb: 20, 20, 20;
+    }
+
+    html.dark {
+      --bg: #0E0E0E;
+      --bg-elevated: #151515;
+      --fg: #EBEBEB;
+      --fg-muted: #888888;
+      --fg-subtle: #4D4D4D;
+      --border: rgba(255, 255, 255, 0.09);
+      --border-hover: rgba(255, 255, 255, 0.32);
+      --ascii-rgb: 235, 235, 235;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      letter-spacing: -0.015em;
+      transition: background-color 0.35s ease, color 0.35s ease;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .hairline {
+      border-color: var(--border);
+    }
+
+    .hairline-hover:hover {
+      border-color: var(--border-hover);
+    }
+
+    .bg-main {
+      background-color: var(--bg);
+    }
+
+    .bg-elevated {
+      background-color: var(--bg-elevated);
+    }
+
+    .text-muted {
+      color: var(--fg-muted);
+    }
+
+    .text-subtle {
+      color: var(--fg-subtle);
+    }
+
+    .mono-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* Smooth accordion for Backend index rows */
+    .row-expand {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .project-row.is-open .row-expand {
+      grid-template-rows: 1fr;
+    }
+    .row-expand-inner {
+      overflow: hidden;
+    }
+
+    /* Subtle custom cursor follower on desktop */
+    @media (pointer: fine) {
+      #cursor-dot {
+        position: fixed;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        transition: opacity 0.2s ease;
+      }
+    }
+    @media (pointer: coarse) {
+      #cursor-dot {
+        display: none;
+      }
+    }
+
+    /* Fade-in reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    ::selection {
+      background-color: var(--fg);
+      color: var(--bg);
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Minimal Custom Cursor Dot + Micro Label -->
+  <div id="cursor-dot" class="hidden sm:flex items-center gap-2 opacity-0">
+    <span class="w-1.5 h-1.5 rounded-full bg-current block"></span>
+    <span id="cursor-label" class="mono-meta text-[10px] tracking-widest opacity-80"></span>
+  </div>
+
+  <!-- Minimalist Floating Toast -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 px-4 py-2 border hairline bg-main/95 backdrop-blur-md mono-meta text-[11px]">
+    <span id="toast-text">COPIED TO CLIPBOARD</span>
+  </div>
+
+  <!-- Case Study / Media Lightbox Modal -->
+  <div id="lightbox" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-8 bg-black/60 backdrop-blur-md">
+    <div class="relative w-full max-w-4xl border hairline bg-main p-6 sm:p-10 max-h-[90vh] overflow-y-auto transition-colors duration-300">
+      <div class="flex items-center justify-between border-b hairline pb-4 mb-8">
+        <span id="lb-index" class="mono-meta text-muted">01 / CASE STUDY</span>
+        <button id="lb-close" type="button" class="mono-meta hover:opacity-50 transition-opacity cursor-pointer">
+          [ CLOSE × ]
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Interactive Media / ASCII Frame -->
+        <div class="lg:col-span-7 space-y-3">
+          <div class="aspect-[16/10] w-full border hairline bg-elevated relative overflow-hidden">
+            <div id="lb-media" class="w-full h-full"></div>
+            <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center mono-meta text-[10px] text-muted bg-main/85 backdrop-blur-sm px-3 py-1.5 border hairline">
+              <span id="lb-filename">asset.png</span>
+              <span id="lb-asset-counter">1 / 1</span>
+            </div>
+          </div>
+
+          <!-- Asset Selector Pills (Mapped to Google Drive files) -->
+          <div class="pt-1">
+            <div class="mono-meta text-[10px] text-subtle mb-2" data-i18n="lb_assets_title">ARCHIVE FILES (GOOGLE DRIVE)</div>
+            <div id="lb-pills" class="flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+
+        <!-- Case Metadata -->
+        <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div id="lb-category" class="mono-meta text-muted">INTERACTIVE</div>
+            <h3 id="lb-title" class="text-2xl sm:text-3xl font-light tracking-tight">Project Title</h3>
+            <p id="lb-desc" class="text-sm text-muted leading-relaxed font-light">Description</p>
+          </div>
+
+          <div class="space-y-4 pt-4 border-t hairline">
+            <div>
+              <div class="mono-meta text-[10px] text-subtle mb-2" data-i18n="lb_stack_title">DISCIPLINES & TOOLS</div>
+              <div id="lb-stack" class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-xs text-muted"></div>
+            </div>
+
+            <div id="lb-action" class="pt-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Minimal Fixed Navigation Bar -->
+  <header class="fixed top-0 left-0 right-0 z-40 bg-main/80 backdrop-blur-md border-b hairline transition-colors duration-300">
+    <div class="max-w-[1360px] mx-auto px-5 sm:px-10 h-14 flex items-center justify-between">
+      <!-- Left: Name + Astana Live Clock -->
+      <div class="flex items-center gap-6">
+        <a href="#hero" class="mono-meta font-normal tracking-[0.12em] hover:opacity-60 transition-opacity scramble">
+          DAIANA ARAPBEKOVA
+        </a>
+        <span id="astana-clock" class="hidden lg:inline-block mono-meta text-subtle text-[10px]">
+          ASTANA, KZ // --:--:--
+        </span>
+      </div>
+
+      <!-- Right: Minimal Navigation + RU/EN + Day/Night -->
+      <div class="flex items-center gap-5 sm:gap-8">
+        <nav class="hidden md:flex items-center gap-6 mono-meta text-[11px] text-muted">
+          <a href="#backend" class="hover:text-current transition-colors scramble" data-i18n="nav_backend">backend</a>
+          <a href="#gamedev" class="hover:text-current transition-colors scramble" data-i18n="nav_gamedev">gamedev</a>
+          <a href="#about" class="hover:text-current transition-colors scramble" data-i18n="nav_about">about</a>
+          <a href="#contact" class="hover:text-current transition-colors scramble" data-i18n="nav_contact">contact</a>
+        </nav>
+
+        <div class="flex items-center gap-3 mono-meta text-[11px]">
+          <button id="lang-btn" type="button" class="text-muted hover:text-current transition-colors cursor-pointer px-1.5 py-1" aria-label="Toggle Language">
+            <span id="lang-indicator">EN / RU</span>
+          </button>
+          <span class="text-subtle">/</span>
+          <button id="theme-btn" type="button" class="text-muted hover:text-current transition-colors cursor-pointer px-1.5 py-1" aria-label="Toggle Theme">
+            <span id="theme-indicator">NIGHT</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =======================================================================
+       SECTION 1: HERO WITH AMBIENT INTERACTIVE ASCII WAVE FIELD
+       ======================================================================= -->
+  <section id="hero" class="relative min-h-screen flex flex-col justify-between pt-24 pb-8 px-5 sm:px-10 max-w-[1360px] mx-auto">
+    <!-- Full-bleed Ambient ASCII Canvas Background -->
+    <canvas id="hero-ascii-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-95"></canvas>
+
+    <!-- Top Micro Metadata -->
+    <div class="relative z-10 flex justify-between items-center mono-meta text-[10px] text-muted pt-2">
+      <span data-i18n="hero_index">00 — INDEX / PORTFOLIO</span>
+      <span class="hidden sm:inline">51.1694° N, 71.4491° E</span>
+    </div>
+
+    <!-- Center Editorial Statement -->
+    <div class="relative z-10 my-auto py-16 sm:py-24 max-w-4xl">
+      <p class="mono-meta text-muted mb-6" data-i18n="hero_role">
+        BACKEND ENGINEER &amp; GAME DEVELOPER
+      </p>
+      <h1 class="text-3xl sm:text-5xl md:text-[56px] font-light tracking-[-0.03em] leading-[1.12] mb-8" data-i18n="hero_headline">
+        Daiana Arapbekova — crafting resilient distributed backends and atmospheric 3D interactive worlds.
+      </h1>
+      <div class="flex flex-wrap items-center gap-6 mono-meta text-[11px]">
+        <a href="https://github.com/daianartist" target="_blank" rel="noopener noreferrer" class="pb-0.5 border-b hairline hairline-hover hover:opacity-70 transition-all scramble" data-cursor="GITHUB">
+          GITHUB ↗
+        </a>
+        <a href="https://www.linkedin.com/in/daiana-arapbekova-6a0527296/" target="_blank" rel="noopener noreferrer" class="pb-0.5 border-b hairline hairline-hover hover:opacity-70 transition-all scramble" data-cursor="LINKEDIN">
+          LINKEDIN ↗
+        </a>
+        <a href="https://karadespot.itch.io/crunchie-munchie" target="_blank" rel="noopener noreferrer" class="pb-0.5 border-b hairline hairline-hover hover:opacity-70 transition-all scramble" data-cursor="PLAY">
+          ITCH.IO ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Bottom Hero Metadata Bar -->
+    <div class="relative z-10 pt-6 border-t hairline flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mono-meta text-[10px] text-muted">
+      <div data-i18n="hero_current">CURRENTLY — IT AUTOMATION @ КАР TECHNOLOGY</div>
+      <div class="flex items-center gap-6">
+        <span data-i18n="hero_based">BASED IN ASTANA, KZ</span>
+        <a href="#backend" class="hover:text-current transition-colors" data-i18n="hero_scroll">[SCROLL ↓]</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main class="relative z-10 bg-main/90 backdrop-blur-[2px] border-t hairline transition-colors duration-300">
+    <div class="max-w-[1360px] mx-auto px-5 sm:px-10">
+
+      <!-- =====================================================================
+           SECTION 2: SELECTED BACKEND WORK (#backend)
+           ===================================================================== -->
+      <section id="backend" class="py-24 sm:py-36 border-b hairline reveal">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
+          <div>
+            <div class="mono-meta text-muted mb-3">01 / BACKEND SYSTEMS</div>
+            <h2 class="text-2xl sm:text-4xl font-light tracking-[-0.025em]" data-i18n="backend_heading">
+              Selected Engineering Work
+            </h2>
+          </div>
+          <div class="mono-meta text-[10px] text-subtle" data-i18n="backend_hint">
+            SELECT A ROW TO INSPECT ARCHITECTURE
+          </div>
+        </div>
+
+        <!-- Romain Avalle-style Minimalist Hairline Index Table -->
+        <div id="backend-rows" class="border-t hairline">
+          <!-- Rendered by JS -->
+        </div>
+        <div class="pt-8 flex flex-wrap gap-x-6 gap-y-3 mono-meta text-[10px] text-muted" aria-label="More GitHub repositories">
+          <a href="https://github.com/daianartist/1337b04rd" target="_blank" rel="noopener noreferrer" class="border-b hairline hairline-hover pb-0.5 hover:text-current transition-colors">1337b04rd ↗</a>
+          <a href="https://github.com/daianartist/RSShub" target="_blank" rel="noopener noreferrer" class="border-b hairline hairline-hover pb-0.5 hover:text-current transition-colors">RSShub ↗</a>
+          <a href="https://github.com/daianartist/where-is-my-pizza" target="_blank" rel="noopener noreferrer" class="border-b hairline hairline-hover pb-0.5 hover:text-current transition-colors">Where Is My Pizza ↗</a>
+          <a href="https://github.com/daianartist/hot-coffee" target="_blank" rel="noopener noreferrer" class="border-b hairline hairline-hover pb-0.5 hover:text-current transition-colors">Hot Coffee ↗</a>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 3: GAMEDEV & 3D TECHNICAL ART (#gamedev)
+           ===================================================================== -->
+      <section id="gamedev" class="py-24 sm:py-36 border-b hairline reveal">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+          <div>
+            <div class="mono-meta text-muted mb-3">02 / INTERACTIVE &amp; 3D</div>
+            <h2 class="text-2xl sm:text-4xl font-light tracking-[-0.025em]" data-i18n="gamedev_heading">
+              GameDev, Rigging &amp; Worlds
+            </h2>
+          </div>
+
+          <!-- Minimal Filter Links -->
+          <div class="flex items-center gap-5 mono-meta text-[11px]" id="gamedev-filters">
+            <button type="button" data-filter="all" class="gd-filter text-current border-b border-current pb-0.5 cursor-pointer" data-i18n="filter_all">
+              ALL (04)
+            </button>
+            <button type="button" data-filter="games" class="gd-filter text-muted hover:text-current pb-0.5 cursor-pointer transition-colors" data-i18n="filter_games">
+              GAMES (03)
+            </button>
+            <button type="button" data-filter="3d" class="gd-filter text-muted hover:text-current pb-0.5 cursor-pointer transition-colors" data-i18n="filter_3d">
+              3D &amp; RIGGING (01)
+            </button>
+          </div>
+        </div>
+
+        <!-- Clean Editorial 2-Column Gallery -->
+        <div id="gamedev-gallery" class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 4: ABOUT, EXPERIENCE & STACK (#about)
+           ===================================================================== -->
+      <section id="about" class="py-24 sm:py-36 border-b hairline reveal">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          <!-- Left Sticky Column -->
+          <div class="lg:col-span-4 lg:sticky lg:top-24 space-y-8">
+            <div>
+              <div class="mono-meta text-muted mb-3">03 / PROFILE</div>
+              <h2 class="text-2xl sm:text-4xl font-light tracking-[-0.025em]" data-i18n="about_heading">
+                About
+              </h2>
+            </div>
+
+            <!-- Subtle Ambient ASCII Portrait / Signal Box -->
+            <div class="border hairline p-4 bg-elevated/40">
+              <canvas id="about-ascii-canvas" class="w-full h-44 block"></canvas>
+              <div class="mt-3 pt-2 border-t hairline flex justify-between mono-meta text-[10px] text-subtle">
+                <span>DAIANA ARAPBEKOVA</span>
+                <span>CARDIFF UNIV. KZ</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Editorial Column -->
+          <div class="lg:col-span-8 space-y-16">
+            <!-- Bio -->
+            <p class="text-xl sm:text-2xl font-light leading-relaxed tracking-[-0.015em]" data-i18n="about_bio">
+              Computer Science undergraduate at Cardiff University Kazakhstan bridging distributed backend engineering (Go, Python) and interactive 3D game development (Unity, C#, Maya). Focused on clean architecture, fault-tolerant pipelines, and atmospheric visual storytelling.
+            </p>
+
+            <!-- Experience -->
+            <div>
+              <div class="mono-meta text-muted mb-6" data-i18n="exp_label">EXPERIENCE</div>
+              <div id="experience-container" class="border-t hairline divide-y hairline">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+
+            <!-- Education & Certifications -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-10 pt-2">
+              <div>
+                <div class="mono-meta text-muted mb-5" data-i18n="edu_label">EDUCATION</div>
+                <div id="education-container" class="space-y-5"></div>
+              </div>
+              <div>
+                <div class="mono-meta text-muted mb-5" data-i18n="cert_label">CERTIFICATIONS</div>
+                <div id="cert-container" class="space-y-5"></div>
+              </div>
+            </div>
+
+            <!-- Technical Stack -->
+            <div class="pt-2">
+              <div class="mono-meta text-muted mb-6" data-i18n="skills_label">CAPABILITIES &amp; STACK</div>
+              <div id="skills-container" class="border-t hairline divide-y hairline">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION 5: CONTACT (#contact)
+           ===================================================================== -->
+      <section id="contact" class="py-24 sm:py-36 reveal">
+        <div class="mono-meta text-muted mb-4">04 / CONTACT</div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          <!-- Left Direct Channels -->
+          <div class="lg:col-span-6 space-y-8">
+            <h2 class="text-3xl sm:text-5xl font-light tracking-[-0.03em] leading-tight" data-i18n="contact_heading">
+              Let’s build something resilient and memorable.
+            </h2>
+
+            <div class="space-y-4 pt-2">
+              <div>
+                <div class="mono-meta text-[10px] text-subtle mb-1">EMAIL</div>
+                <div class="flex flex-wrap items-center gap-4">
+                  <a href="mailto:daianaarapbekova@gmail.com" class="text-lg sm:text-xl font-light border-b hairline hairline-hover pb-0.5 hover:opacity-70 transition-opacity">
+                    daianaarapbekova@gmail.com
+                  </a>
+                  <button id="copy-email" type="button" class="mono-meta text-[10px] text-muted hover:text-current border hairline px-2.5 py-1 cursor-pointer transition-colors" data-i18n="copy_btn">
+                    COPY
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <div class="mono-meta text-[10px] text-subtle mb-1" data-i18n="phone_label">PHONE</div>
+                <a href="tel:+77761061707" class="font-mono text-sm text-muted hover:text-current transition-colors">
+                  +7 (776) 106-17-07
+                </a>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-6 pt-4 mono-meta text-[11px]">
+              <a href="https://github.com/daianartist" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity scramble">GITHUB ↗</a>
+              <a href="https://www.linkedin.com/in/daiana-arapbekova-6a0527296/" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity scramble">LINKEDIN ↗</a>
+              <a href="https://karadespot.itch.io/crunchie-munchie" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity scramble">ITCH.IO ↗</a>
+            </div>
+          </div>
+
+          <!-- Right Minimalist Borderless-Underline Form -->
+          <div class="lg:col-span-6">
+            <form id="contact-form" class="space-y-6">
+              <div>
+                <label for="f-name" class="block mono-meta text-[10px] text-muted mb-2" data-i18n="form_name">NAME</label>
+                <input id="f-name" name="name" type="text" required placeholder="Your name" class="w-full bg-transparent border-b hairline py-2.5 text-sm focus:outline-none focus:border-current transition-colors" />
+              </div>
+
+              <div>
+                <label for="f-email" class="block mono-meta text-[10px] text-muted mb-2" data-i18n="form_email">EMAIL</label>
+                <input id="f-email" name="_replyto" type="email" required placeholder="you@example.com" class="w-full bg-transparent border-b hairline py-2.5 text-sm focus:outline-none focus:border-current transition-colors" />
+              </div>
+
+              <div>
+                <label for="f-message" class="block mono-meta text-[10px] text-muted mb-2" data-i18n="form_msg">MESSAGE</label>
+                <textarea id="f-message" name="message" rows="3" required placeholder="Tell me about your project or role..." class="w-full bg-transparent border-b hairline py-2.5 text-sm focus:outline-none focus:border-current transition-colors resize-none"></textarea>
+              </div>
+
+              <div class="pt-2 flex items-center justify-between gap-4">
+                <button type="submit" class="mono-meta text-[11px] px-6 py-3 border hairline hairline-hover hover:bg-elevated transition-colors cursor-pointer" data-i18n="form_submit">
+                  SEND MESSAGE →
+                </button>
+                <span id="form-feedback" class="mono-meta text-[10px] text-muted hidden"></span>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Subtle ASCII Horizon Footer -->
+        <div class="mt-24 pt-8 border-t hairline flex flex-col sm:flex-row justify-between items-center gap-4 mono-meta text-[10px] text-subtle">
+          <span>© 2026 DAIANA ARAPBEKOVA</span>
+          <span>ASTANA, KAZAKHSTAN</span>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // =========================================================================
+    // 1. BILINGUAL CONTENT (EN / RU)
+    // =========================================================================
+    const CONTENT = {
+      en: {
+        nav_backend: "backend",
+        nav_gamedev: "gamedev",
+        nav_about: "about",
+        nav_contact: "contact",
+        hero_index: "00 — INDEX / PORTFOLIO",
+        hero_role: "BACKEND ENGINEER & GAME DEVELOPER",
+        hero_headline: "Daiana Arapbekova — crafting resilient distributed backends and atmospheric 3D interactive worlds.",
+        hero_current: "CURRENTLY — IT AUTOMATION @ КАР TECHNOLOGY",
+        hero_based: "BASED IN ASTANA, KZ",
+        hero_scroll: "[SCROLL ↓]",
+        backend_heading: "Selected Engineering Work",
+        backend_hint: "SELECT A ROW TO INSPECT ARCHITECTURE",
+        gamedev_heading: "GameDev, Rigging & Worlds",
+        filter_all: "ALL (04)",
+        filter_games: "GAMES (03)",
+        filter_3d: "3D & RIGGING (01)",
+        about_heading: "About",
+        about_bio: "Computer Science undergraduate at Cardiff University Kazakhstan bridging distributed backend engineering (Go, Python) and interactive 3D game development (Unity, C#, Maya). Focused on clean architecture, fault-tolerant pipelines, and atmospheric visual storytelling.",
+        exp_label: "EXPERIENCE",
+        edu_label: "EDUCATION",
+        cert_label: "CERTIFICATIONS",
+        skills_label: "CAPABILITIES & STACK",
+        contact_heading: "Let’s build something resilient and memorable.",
+        copy_btn: "COPY",
+        phone_label: "PHONE",
+        form_name: "NAME",
+        form_email: "EMAIL",
+        form_msg: "MESSAGE",
+        form_submit: "SEND MESSAGE →",
+        form_sent: "MESSAGE RECEIVED — THANK YOU",
+        form_sending: "SENDING…",
+        form_error: "COULD NOT SEND — PLEASE TRY AGAIN",
+        toast_copied: "EMAIL COPIED TO CLIPBOARD",
+        lb_assets_title: "ARCHIVE FILES (GOOGLE DRIVE)",
+        lb_stack_title: "DISCIPLINES & TOOLS",
+        play_itch: "PLAY ON ITCH.IO ↗",
+        view_repo: "VIEW ON GITHUB ↗"
+      },
+      ru: {
+        nav_backend: "бэкенд",
+        nav_gamedev: "геймдев",
+        nav_about: "обо мне",
+        nav_contact: "контакты",
+        hero_index: "00 — ИНДЕКС / ПОРТФОЛИО",
+        hero_role: "БЭКЕНД-ИНЖЕНЕР И РАЗРАБОТЧИК ИГР",
+        hero_headline: "Дайана Арапбекова — создаю отказоустойчивые распределённые бэкенды и атмосферные интерактивные 3D-миры.",
+        hero_current: "СЕЙЧАС — АВТОМАТИЗАЦИЯ ИТ @ КАР TECHNOLOGY",
+        hero_based: "АСТАНА, КАЗАХСТАН",
+        hero_scroll: "[ВНИЗ ↓]",
+        backend_heading: "Избранные Backend-проекты",
+        backend_hint: "НАЖМИТЕ НА СТРОКУ ДЛЯ ПРОСМОТРА АРХИТЕКТУРЫ",
+        gamedev_heading: "GameDev, риггинг и 3D-миры",
+        filter_all: "ВСЕ (04)",
+        filter_games: "ИГРЫ (03)",
+        filter_3d: "3D И РИГГИНГ (01)",
+        about_heading: "Обо мне",
+        about_bio: "Студентка компьютерных наук Cardiff University Kazakhstan. Объединяю разработку распределённых бэкенд-систем (Go, Python) и создание интерактивных 3D-игр (Unity, C#, Maya). Фокусируюсь на чистой архитектуре, отказоустойчивости и визуальной выразительности.",
+        exp_label: "ОПЫТ РАБОТЫ",
+        edu_label: "ОБРАЗОВАНИЕ",
+        cert_label: "СЕРТИФИКАТЫ",
+        skills_label: "НАВЫКИ И СТЕК",
+        contact_heading: "Давайте создадим что-то надёжное и выразительное.",
+        copy_btn: "КОПИРОВАТЬ",
+        phone_label: "ТЕЛЕФОН",
+        form_name: "ИМЯ",
+        form_email: "EMAIL",
+        form_msg: "СООБЩЕНИЕ",
+        form_submit: "ОТПРАВИТЬ →",
+        form_sent: "СООБЩЕНИЕ ОТПРАВЛЕНО — СПАСИБО",
+        form_sending: "ОТПРАВКА…",
+        form_error: "НЕ УДАЛОСЬ ОТПРАВИТЬ — ПОПРОБУЙТЕ ЕЩЁ РАЗ",
+        toast_copied: "EMAIL СКОПИРОВАН",
+        lb_assets_title: "ФАЙЛЫ ПРОЕКТА (GOOGLE DRIVE)",
+        lb_stack_title: "ИНСТРУМЕНТЫ И СТЕК",
+        play_itch: "ИГРАТЬ НА ITCH.IO ↗",
+        view_repo: "ОТКРЫТЬ GITHUB ↗"
+      }
+    };
+
+    const BACKEND_WORK = [
+      {
+        num: "01",
+        title: { en: "Ride Hail — SOA Taxi Backend", ru: "Ride Hail — SOA-бэкенд такси" },
+        stack: "Go · PostGIS · RabbitMQ · WebSockets · Docker · JWT",
+        year: "2024",
+        github: "https://github.com/daianartist/ride-hail",
+        desc: {
+          en: "Event-driven taxi service backend built in Go featuring asynchronous messaging via RabbitMQ (Topic & Fanout exchanges) and role-based JWT authentication (Passenger, Driver, Admin). Includes spatial driver matching via PostGIS, WebSocket ride offers, and live GPS telemetry.",
+          ru: "Событийно-ориентированный бэкенд такси на Go с асинхронным обменом сообщениями через RabbitMQ (Topic, Fanout) и JWT-авторизацией (Passenger, Driver, Admin). Пространственный поиск водителей через PostGIS, WebSocket-рассылка офферов и трансляция GPS в реальном времени."
+        },
+        asciiFlow: `Client / Driver (WS) ──▶ Go API Gateway (JWT)
+                            │
+                  RabbitMQ (Topic / Fanout)
+                     ├──▶ Driver Matching (PostGIS)
+                     └──▶ Live GPS Telemetry`
+      },
+      {
+        num: "02",
+        title: { en: "Marketflow — Real-Time Crypto Processor", ru: "Marketflow — Процессор рыночных данных" },
+        stack: "Go · PostgreSQL · Redis · Docker · Hexagonal Arch",
+        year: "2024",
+        github: "https://github.com/daianartist/marketflow",
+        desc: {
+          en: "High-throughput market data processor leveraging Go concurrency patterns (worker pools, fan-in/fan-out pipelines) to process live cryptocurrency price updates. Built on Hexagonal Architecture with PostgreSQL storage and low-latency Redis caching.",
+          ru: "Процессор рыночных данных на конкурентных паттернах Go (пулы воркеров, fan-in/fan-out) для обработки обновлений криптовалютных цен в реальном времени. Строгая гексагональная архитектура с PostgreSQL и низколатентным кэшированием в Redis."
+        },
+        asciiFlow: `Exchange Streams ──▶ Go Worker Pools (Fan-In/Out)
+                          │
+                Hexagonal Domain Core
+                   ├──▶ Redis Hot Cache
+                   └──▶ PostgreSQL Analytics`
+      },
+      {
+        num: "03",
+        title: { en: "Attendance Control Platform", ru: "Система контроля посещаемости" },
+        stack: "C# · .NET MAUI · Python (Flask) · PostgreSQL · Geofencing",
+        year: "2024–2025",
+        desc: {
+          en: "University-wide attendance platform serving 900+ users. Integrates QR check-ins, campus perimeter geofencing validation, cross-platform mobile client (.NET MAUI), and an administrative analytics dashboard.",
+          ru: "Университетская платформа учёта посещаемости для 900+ пользователей с QR-отметками, геозонированием по периметру кампуса, мобильным клиентом (.NET MAUI) и аналитической панелью."
+        },
+        asciiFlow: `.NET MAUI (QR + GPS) ──▶ Flask REST API
+                            │
+                  Geofence Perimeter Check
+                            │
+                 PostgreSQL + Dashboard`
+      },
+    ];
+
+    const GAMEDEV_WORK = [
+      {
+        id: "crunchie",
+        num: "01",
+        category: "games",
+        subtitle: { en: "PLAYABLE INDIE RELEASE", ru: "РЕЛИЗ НА ITCH.IO" },
+        title: { en: "Crunchie Munchie", ru: "Crunchie Munchie" },
+        stack: ["Game Design", "UI/UX", "Itch.io"],
+        desc: {
+          en: "Stylized playable indie game published on itch.io featuring custom interface art, responsive arcade mechanics, and playful visual direction.",
+          ru: "Стилизованная инди-игра, опубликованная на itch.io, с авторским интерфейсом, отзывчивой аркадной механикой и выразительным визуальным стилем."
+        },
+        itchUrl: "https://karadespot.itch.io/crunchie-munchie",
+        assets: [
+          "Crunchie Munchie1.jpg",
+          "Crunchie Munchie2.jpg",
+          "Crunchie Munchie3.jpg",
+          "Crunchie Munchie4.jpg",
+          "Crunchie Munchie5.jpg"
+        ]
+      },
+      {
+        id: "once-upon-a-box",
+        num: "02",
+        category: "games",
+        subtitle: { en: "3D FANTASY PUZZLE", ru: "3D-ГОЛОВОЛОМКА" },
+        title: { en: "Once Upon A Box", ru: "Once Upon A Box" },
+        stack: ["Unity", "C#", "Autodesk Maya", "Substance 3D"],
+        desc: {
+          en: "3D fantasy puzzle game in Unity (3D-Tetris mechanics) combining spatial logic, physics-based interactions, and low-poly stylized environments.",
+          ru: "Трёхмерная фэнтези-головоломка на Unity (механика 3D-тетриса) с пространственной логикой, физикой взаимодействий и низкополигональной стилизацией."
+        },
+        githubUrl: "https://github.com/daianartist/onceuponabox",
+        assets: ["Game-once upon a box-gameplay.png", "once upon a box.png", "3dmodels-once upon a box-props.png"],
+        visualType: "iso-blocks"
+      },
+      {
+        id: "zheztyrnaq",
+        num: "03",
+        category: "games",
+        subtitle: { en: "FOLK-HORROR ADVENTURE", ru: "ФОЛК-ХОРРОР / ПРИКЛЮЧЕНИЕ" },
+        title: { en: "Zheztyrnaq (Жезтырнак)", ru: "Жезтырнак (Zheztyrnaq)" },
+        stack: ["Narrative Design", "Environment Art", "Kazakh Folklore"],
+        desc: {
+          en: "Atmospheric mystery adventure set deep in the Altai forests, inspired by Kazakh and Turkic mythology, featuring environmental storytelling and exploration.",
+          ru: "Атмосферное мистическое приключение в лесах Алтая, вдохновлённое казахским и тюркским фольклором, с повествованием через окружение и исследованием."
+        },
+        assets: [
+          "zheztyrnaq-game1.jpg",
+          "zheztyrnaq-game2.jpg",
+          "zheztyrnaq-game3.jpg",
+          "zheztyrnaq-game4.jpg",
+          "zheztyrnaq-game5.jpg"
+        ],
+        visualType: "altai-contours"
+      },
+      {
+        id: "rigging-3d",
+        num: "04",
+        category: "3d",
+        subtitle: { en: "CHARACTER & PROP RIGGING", ru: "РИГГИНГ И 3D-АНИМАЦИЯ" },
+        title: { en: "3D Modeling, Rigging & Animation", ru: "3D-моделирование и риггинг" },
+        stack: ["Autodesk Maya", "Substance 3D", "IK/FK Rigging", "Animation"],
+        desc: {
+          en: "Custom skeletal rigging for characters and props (including an articulated human-cat hybrid rig and mechanical prop rigs), PBR texturing, and keyframe animation.",
+          ru: "Создание скелетных ригов персонажей и пропсов (гибридный риг человека-кошки и механические риги), PBR-текстурирование в Substance 3D и анимация."
+        },
+        assets: [
+          "trashBinRender.jpg",
+          "3d-models-props.png",
+          "rig-human_cat.png",
+          " rig-human-cat2.png",
+          "rig-human-cat3.png",
+          "rig-trash-bin.png",
+          "3dModelAnimationTrashBin.mov"
+        ],
+        visualType: "kinematics"
+      }
+    ];
+
+    const EXPERIENCE = [
+      {
+        period: { en: "2026 — PRESENT", ru: "2026 — НАСТ. ВРЕМЯ" },
+        company: "ТОО «КАР Technology»",
+        role: { en: "IT Support Automation Engineer", ru: "Автоматизация ИТ-обеспечения" },
+        detail: {
+          en: "Designed and engineered a fault-tolerant HikCentral API integration pipeline automating security alarm ingestion and CCTV video analytics across subsidiary organizations.",
+          ru: "Спроектировала и разработала отказоустойчивую систему интеграции с API HikCentral для автоматизации сбора тревог и аналитики видеонаблюдения дочерних организаций."
+        }
+      },
+      {
+        period: { en: "2024 — 2025", ru: "2024 — 2025" },
+        company: "ТОО «Horus»",
+        role: { en: "Software Developer", ru: "Разработчик программного обеспечения" },
+        detail: {
+          en: "Built a campus attendance system for 900+ users with an analytics dashboard and geofencing perimeter validation.",
+          ru: "Разработала систему учёта посещаемости для 900+ пользователей с аналитической панелью и геозонированием по периметру кампуса."
+        }
+      },
+      {
+        period: { en: "2024", ru: "2024" },
+        company: "ТОО «DAX Group»",
+        role: { en: "1C Data Analyst & Methodologist", ru: "Аналитик данных 1С, Методолог" },
+        detail: {
+          en: "Authored technical specifications (PRDs) for 1C modules and improved client reporting data accuracy.",
+          ru: "Составляла технические задания для модулей 1С и повышала точность клиентской отчётности."
+        }
+      }
+    ];
+
+    const EDUCATION = [
+      {
+        years: "2025 — 2029",
+        title: "Cardiff University Kazakhstan",
+        sub: { en: "BSc Computer Science", ru: "Компьютерные науки" }
+      },
+      {
+        years: "2022 — 2025",
+        title: "Astana IT University College",
+        sub: { en: "Software Development", ru: "Разработка программного обеспечения" }
+      }
+    ];
+
+    const CERTIFICATIONS = [
+      {
+        org: "Alem School",
+        title: { en: "Backend Development in Go (1-Year Program)", ru: "Бэкенд-разработка на Go (годовая программа)" }
+      },
+      {
+        org: "OMNIUM",
+        title: { en: "GAMEDEV TEAMS Incubation Program", ru: "Инкубационная программа GAMEDEV TEAMS" }
+      },
+      {
+        org: "1C Kazakhstan",
+        title: { en: "1C:Enterprise 8 Programming", ru: "Программирование в 1С:Предприятие 8" }
+      }
+    ];
+
+    const SKILLS = [
+      {
+        label: { en: "LANGUAGES", ru: "ЯЗЫКИ" },
+        value: "Go, Python (FastAPI, Flask, Django), C# (.NET MAUI, Unity), Java, C++, SQL (PostgreSQL, PL/pgSQL)"
+      },
+      {
+        label: { en: "BACKEND & INFRA", ru: "БЭКЕНД И ИНФРА" },
+        value: "Docker, GitLab CI/CD, Nginx, MinIO (S3), Redis, RabbitMQ, PostGIS, Alembic, Linux VPS"
+      },
+      {
+        label: { en: "GAMEDEV & 3D", ru: "ГЕЙМДЕВ И 3D" },
+        value: "Unity, Autodesk Maya (Modeling, Rigging, Animation), Substance 3D"
+      },
+      {
+        label: { en: "TOOLS & METHODS", ru: "ИНСТРУМЕНТЫ" },
+        value: "Git/GitLab, Postman, Firebase (FCM), Figma, Agile/Scrum, PRD Authoring"
+      }
+    ];
+
+    // =========================================================================
+    // 2. STATE, THEME & LANGUAGE SWITCHERS
+    // =========================================================================
+    let lang = "en";
+    let activeFilter = "all";
+    let expandedRow = null;
+
+    function updateTexts() {
+      const dict = CONTENT[lang];
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      const langIndicator = document.getElementById("lang-indicator");
+      langIndicator.innerHTML = lang === "en"
+        ? `<span class="text-current">EN</span> / RU`
+        : `EN / <span class="text-current">RU</span>`;
+
+      renderBackend();
+      renderGamedev();
+      renderAbout();
+    }
+
+    document.getElementById("lang-btn").addEventListener("click", () => {
+      lang = lang === "en" ? "ru" : "en";
+      updateTexts();
+    });
+
+    const themeBtn = document.getElementById("theme-btn");
+    const themeIndicator = document.getElementById("theme-indicator");
+
+    themeBtn.addEventListener("click", () => {
+      const isDark = document.documentElement.classList.toggle("dark");
+      themeIndicator.textContent = isDark ? "NIGHT" : "DAY";
+      // Re-render canvases to match theme ink
+      GAMEDEV_WORK.forEach((p) => {
+        const c = document.getElementById(`gd-media-${p.id}`);
+        if (c) renderProjectMedia(c, p.assets[0], p.title[lang]);
+      });
+    });
+
+    // Live Astana Clock (UTC+5)
+    function updateClock() {
+      const clockEl = document.getElementById("astana-clock");
+      if (!clockEl) return;
+      try {
+        const now = new Date();
+        const timeStr = new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Almaty",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false
+        }).format(now);
+        clockEl.textContent = `ASTANA, KZ // ${timeStr}`;
+      } catch (e) {
+        clockEl.textContent = "ASTANA, KZ // UTC+5";
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // =========================================================================
+    // 3. RENDER SECTIONS
+    // =========================================================================
+    function renderBackend() {
+      const container = document.getElementById("backend-rows");
+      container.innerHTML = "";
+
+      BACKEND_WORK.forEach((item) => {
+        const isOpen = expandedRow === item.num;
+        const row = document.createElement("div");
+        row.className = `project-row border-b hairline transition-colors ${isOpen ? "is-open" : ""}`;
+
+        row.innerHTML = `
+          <button type="button" data-cursor="INSPECT" class="w-full text-left py-7 sm:py-8 grid grid-cols-12 gap-4 items-baseline group cursor-pointer focus:outline-none">
+            <div class="col-span-2 sm:col-span-1 mono-meta text-muted">
+              ${item.num}
+            </div>
+            <div class="col-span-10 sm:col-span-5 text-lg sm:text-2xl font-light tracking-[-0.02em] transition-transform duration-300 group-hover:translate-x-2">
+              ${item.title[lang]}
+            </div>
+            <div class="col-span-9 sm:col-span-5 sm:col-start-7 font-mono text-xs text-muted">
+              ${item.stack}
+            </div>
+            <div class="col-span-3 sm:col-span-1 text-right mono-meta text-subtle">
+              ${item.year}
+            </div>
+          </button>
+
+          <div class="row-expand">
+            <div class="row-expand-inner">
+              <div class="pb-8 pt-2 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-5 lg:col-start-2 space-y-5">
+                  <p class="text-sm text-muted leading-relaxed font-light">
+                    ${item.desc[lang]}
+                  </p>
+                  ${item.github ? `
+                    <div>
+                      <a href="${item.github}" target="_blank" rel="noopener noreferrer" class="inline-block mono-meta text-[11px] pb-0.5 border-b hairline hairline-hover hover:opacity-70 transition-opacity">
+                        ${CONTENT[lang].view_repo}
+                      </a>
+                    </div>
+                  ` : ""}
+                </div>
+                <div class="lg:col-span-6">
+                  <pre class="font-mono text-[11px] leading-relaxed text-muted border hairline p-4 bg-elevated/40 overflow-x-auto">${item.asciiFlow}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        row.querySelector("button").addEventListener("click", () => {
+          expandedRow = expandedRow === item.num ? null : item.num;
+          renderBackend();
+        });
+
+        container.appendChild(row);
+      });
+    }
+
+    function renderGamedev() {
+      const gallery = document.getElementById("gamedev-gallery");
+      gallery.innerHTML = "";
+
+      const list = GAMEDEV_WORK.filter((p) => activeFilter === "all" || p.category === activeFilter);
+
+      list.forEach((proj) => {
+        const article = document.createElement("article");
+        article.className = "group cursor-pointer space-y-4";
+        article.setAttribute("data-cursor", "OPEN");
+
+        article.innerHTML = `
+          <div class="relative aspect-[16/10] w-full border hairline hairline-hover bg-elevated/40 overflow-hidden transition-colors duration-300">
+            <!-- Subtle ASCII Corner Crosshairs -->
+            <span class="absolute top-2 left-2.5 font-mono text-[10px] text-subtle pointer-events-none">+</span>
+            <span class="absolute top-2 right-2.5 font-mono text-[10px] text-subtle pointer-events-none">+</span>
+            <span class="absolute bottom-2 left-2.5 font-mono text-[10px] text-subtle pointer-events-none">+</span>
+            <span class="absolute bottom-2 right-2.5 font-mono text-[10px] text-subtle pointer-events-none">+</span>
+
+            <div id="gd-media-${proj.id}" class="w-full h-full transition-transform duration-700 group-hover:scale-[1.02]"></div>
+          </div>
+
+          <div class="flex items-baseline justify-between gap-4 pt-1">
+            <div>
+              <div class="mono-meta text-[10px] text-muted mb-1">${proj.num} — ${proj.subtitle[lang]}</div>
+              <h3 class="text-xl sm:text-2xl font-light tracking-[-0.02em] group-hover:opacity-75 transition-opacity">
+                ${proj.title[lang]}
+              </h3>
+            </div>
+            <div class="mono-meta text-[11px] text-muted shrink-0">
+              ${proj.itchUrl ? "ITCH.IO ↗" : `[${proj.assets.length} FILES]`}
+            </div>
+          </div>
+
+          <p class="text-sm text-muted font-light leading-relaxed max-w-xl">
+            ${proj.desc[lang]}
+          </p>
+        `;
+
+        article.addEventListener("click", (event) => {
+          if (event.target.closest("video")) return;
+          openLightbox(proj);
+        });
+        gallery.appendChild(article);
+
+        const media = document.getElementById(`gd-media-${proj.id}`);
+        renderProjectMedia(media, proj.assets[0], proj.title[lang]);
+      });
+    }
+
+    document.querySelectorAll(".gd-filter").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".gd-filter").forEach((b) => {
+          b.classList.remove("text-current", "border-b", "border-current");
+          b.classList.add("text-muted");
+        });
+        btn.classList.remove("text-muted");
+        btn.classList.add("text-current", "border-b", "border-current");
+        activeFilter = btn.getAttribute("data-filter");
+        renderGamedev();
+      });
+    });
+
+    function renderAbout() {
+      // Experience
+      document.getElementById("experience-container").innerHTML = EXPERIENCE.map((e) => `
+        <div class="py-5 grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-4 items-baseline">
+          <div class="sm:col-span-3 mono-meta text-[10px] text-muted">${e.period[lang]}</div>
+          <div class="sm:col-span-9 space-y-1.5">
+            <div class="text-base font-normal">${e.role[lang]} <span class="text-muted font-light">— ${e.company}</span></div>
+            <p class="text-sm text-muted font-light leading-relaxed">${e.detail[lang]}</p>
+          </div>
+        </div>
+      `).join("");
+
+      // Education
+      document.getElementById("education-container").innerHTML = EDUCATION.map((ed) => `
+        <div class="space-y-0.5">
+          <div class="mono-meta text-[10px] text-subtle">${ed.years}</div>
+          <div class="text-sm font-normal">${ed.title}</div>
+          <div class="text-xs text-muted font-light">${ed.sub[lang]}</div>
+        </div>
+      `).join("");
+
+      // Certifications
+      document.getElementById("cert-container").innerHTML = CERTIFICATIONS.map((c) => `
+        <div class="space-y-0.5">
+          <div class="mono-meta text-[10px] text-subtle">${c.org}</div>
+          <div class="text-sm font-light">${c.title[lang]}</div>
+        </div>
+      `).join("");
+
+      // Skills
+      document.getElementById("skills-container").innerHTML = SKILLS.map((s) => `
+        <div class="py-4 grid grid-cols-1 sm:grid-cols-12 gap-2 items-baseline">
+          <div class="sm:col-span-3 mono-meta text-[10px] text-muted">${s.label[lang]}</div>
+          <div class="sm:col-span-9 text-sm font-light text-muted">${s.value}</div>
+        </div>
+      `).join("");
+    }
+
+    // =========================================================================
+    // 4. MONOCHROME EDITORIAL ART GENERATORS FOR GAMEDEV & LIGHTBOX
+    // =========================================================================
+    function renderProjectMedia(container, filename, alt) {
+      if (!container) return;
+      const src = `assets/${encodeURIComponent(filename)}`;
+      container.innerHTML = /\.mov$/i.test(filename)
+        ? `<video class="w-full h-full object-contain bg-black" src="${src}" controls playsinline preload="metadata" aria-label="${alt}"></video>`
+        : `<img class="w-full h-full object-contain" src="${src}" alt="${alt}" loading="lazy" />`;
+    }
+
+    function drawEditorialArt(canvas, type, filename) {
+      if (!canvas) return;
+      const isDark = document.documentElement.classList.contains("dark");
+      const ink = isDark ? "235, 235, 235" : "20, 20, 20";
+
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const w = rect.width || 600;
+      const h = rect.height || 375;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+
+      const ctx = canvas.getContext("2d");
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.strokeStyle = `rgba(${ink}, 0.22)`;
+      ctx.fillStyle = `rgba(${ink}, 0.45)`;
+      ctx.font = "10px 'IBM Plex Mono', monospace";
+      ctx.textAlign = "center";
+
+      if (type === "wave-grid") {
+        // Poetic typographic wave matrix for Crunchie Munchie
+        const glyphs = " .·:-=+*#";
+        const cols = 42;
+        const rows = 14;
+        const cellW = w / (cols + 6);
+        const cellH = h / (rows + 6);
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const v = Math.sin(c * 0.25 + r * 0.4) * Math.cos(r * 0.3 - c * 0.15);
+            const idx = Math.floor(((v + 1) / 2) * (glyphs.length - 1));
+            ctx.fillStyle = `rgba(${ink}, ${0.15 + ((v + 1) / 2) * 0.45})`;
+            ctx.fillText(glyphs[idx], (c + 3.5) * cellW, (r + 3.5) * cellH);
+          }
+        }
+      } else if (type === "iso-blocks") {
+        // Minimalist isometric wireframe blocks for Once Upon A Box
+        const cx = w / 2;
+        const cy = h / 2 + 12;
+        const s = Math.min(w, h) * 0.12;
+        const cube = (ox, oy) => {
+          ctx.beginPath();
+          ctx.moveTo(ox, oy - s);
+          ctx.lineTo(ox + s * 0.866, oy - s * 0.5);
+          ctx.lineTo(ox + s * 0.866, oy + s * 0.5);
+          ctx.lineTo(ox, oy + s);
+          ctx.lineTo(ox - s * 0.866, oy + s * 0.5);
+          ctx.lineTo(ox - s * 0.866, oy - s * 0.5);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(ox, oy - s);
+          ctx.lineTo(ox, oy);
+          ctx.lineTo(ox + s * 0.866, oy - s * 0.5);
+          ctx.moveTo(ox, oy);
+          ctx.lineTo(ox - s * 0.866, oy - s * 0.5);
+          ctx.stroke();
+        };
+        cube(cx, cy);
+        cube(cx - s * 0.866, cy - s * 0.5);
+        cube(cx + s * 0.866, cy - s * 0.5);
+        cube(cx, cy - s);
+      } else if (type === "altai-contours") {
+        // Topographical elevation lines for Zheztyrnaq (Altai forests)
+        for (let i = 0; i < 11; i++) {
+          ctx.beginPath();
+          const baseY = h * 0.25 + i * (h * 0.055);
+          for (let x = 24; x <= w - 24; x += 6) {
+            const nx = x / w;
+            const ridge =
+              Math.sin(nx * 6 + i * 0.35) * 18 +
+              Math.cos(nx * 13 - i * 0.2) * 8;
+            const y = baseY + ridge;
+            if (x === 24) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = `rgba(${ink}, ${0.12 + (i / 11) * 0.28})`;
+          ctx.stroke();
+        }
+      } else if (type === "kinematics") {
+        // Minimalist IK/FK bone hierarchy for 3D Rigging
+        const cx = w / 2;
+        const cy = h / 2 - 6;
+        const pts = [
+          [cx, cy - 52],
+          [cx, cy - 22],
+          [cx - 34, cy - 12],
+          [cx + 34, cy - 12],
+          [cx - 52, cy + 18],
+          [cx + 52, cy + 18],
+          [cx, cy + 14],
+          [cx - 20, cy + 54],
+          [cx + 20, cy + 54]
+        ];
+        const links = [[0,1],[1,2],[1,3],[2,4],[3,5],[1,6],[6,7],[6,8]];
+        ctx.strokeStyle = `rgba(${ink}, 0.32)`;
+        links.forEach(([a, b]) => {
+          ctx.beginPath();
+          ctx.moveTo(pts[a][0], pts[a][1]);
+          ctx.lineTo(pts[b][0], pts[b][1]);
+          ctx.stroke();
+        });
+        pts.forEach(([px, py]) => {
+          ctx.beginPath();
+          ctx.arc(px, py, 3, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+      }
+
+      // Subtle center caption watermark
+      ctx.fillStyle = `rgba(${ink}, 0.42)`;
+      ctx.fillText(filename.toUpperCase(), w / 2, h - 18);
+    }
+
+    // Lightbox Controller
+    const lightbox = document.getElementById("lightbox");
+    function openLightbox(proj) {
+      document.getElementById("lb-index").textContent = `${proj.num} / ${proj.subtitle[lang]}`;
+      document.getElementById("lb-category").textContent = proj.subtitle[lang];
+      document.getElementById("lb-title").textContent = proj.title[lang];
+      document.getElementById("lb-desc").textContent = proj.desc[lang];
+      document.getElementById("lb-filename").textContent = proj.assets[0];
+      document.getElementById("lb-asset-counter").textContent = `1 / ${proj.assets.length}`;
+
+      document.getElementById("lb-stack").innerHTML = proj.stack
+        .map((s) => `<span>${s}</span>`)
+        .join(`<span class="text-subtle">·</span>`);
+
+      const pillsEl = document.getElementById("lb-pills");
+      pillsEl.innerHTML = proj.assets
+        .map(
+          (file, idx) => `
+          <button type="button" data-idx="${idx}" class="lb-pill font-mono text-[11px] px-2.5 py-1 border hairline cursor-pointer transition-colors ${
+            idx === 0 ? "bg-elevated text-current" : "text-muted hover:text-current"
+          }">
+            ${file}
+          </button>
+        `
+        )
+        .join("");
+
+      pillsEl.querySelectorAll(".lb-pill").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.getAttribute("data-idx"));
+          pillsEl.querySelectorAll(".lb-pill").forEach((b) => {
+            b.classList.remove("bg-elevated", "text-current");
+            b.classList.add("text-muted");
+          });
+          btn.classList.remove("text-muted");
+          btn.classList.add("bg-elevated", "text-current");
+          document.getElementById("lb-filename").textContent = proj.assets[i];
+          document.getElementById("lb-asset-counter").textContent = `${i + 1} / ${proj.assets.length}`;
+          renderProjectMedia(document.getElementById("lb-media"), proj.assets[i], proj.title[lang]);
+        });
+      });
+
+      const actionEl = document.getElementById("lb-action");
+      actionEl.innerHTML = [
+        proj.itchUrl
+          ? `<a href="${proj.itchUrl}" target="_blank" rel="noopener noreferrer" class="inline-block mono-meta text-[11px] px-4 py-2.5 border hairline hairline-hover hover:bg-elevated transition-colors">${CONTENT[lang].play_itch}</a>`
+          : "",
+        proj.githubUrl
+          ? `<a href="${proj.githubUrl}" target="_blank" rel="noopener noreferrer" class="inline-block mono-meta text-[11px] px-4 py-2.5 border hairline hairline-hover hover:bg-elevated transition-colors">${CONTENT[lang].view_repo}</a>`
+          : ""
+      ].filter(Boolean).join(" ");
+
+      lightbox.classList.remove("hidden");
+      lightbox.classList.add("flex");
+      renderProjectMedia(document.getElementById("lb-media"), proj.assets[0], proj.title[lang]);
+    }
+
+    document.getElementById("lb-close").addEventListener("click", () => {
+      lightbox.classList.add("hidden");
+      lightbox.classList.remove("flex");
+    });
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) {
+        lightbox.classList.add("hidden");
+        lightbox.classList.remove("flex");
+      }
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        lightbox.classList.add("hidden");
+        lightbox.classList.remove("flex");
+      }
+    });
+
+    // =========================================================================
+    // 5. ROMAIN AVALLE SIGNATURE AMBIENT ASCII WAVE FIELD (HERO & ABOUT)
+    // =========================================================================
+    (function initHeroAsciiField() {
+      const canvas = document.getElementById("hero-ascii-canvas");
+      const ctx = canvas.getContext("2d");
+
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+      let mouse = { x: -9999, y: -9999, tx: -9999, ty: -9999 };
+      let time = 0;
+
+      // Dense, high-texture monochrome character ramp inspired by Romain Avalle
+      const ramp = " .·:;+=xX$#@&%08WM";
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      window.addEventListener("resize", resize);
+      window.addEventListener("mousemove", (e) => {
+        mouse.tx = e.clientX;
+        mouse.ty = e.clientY;
+      });
+
+      resize();
+
+      function animate() {
+        time += 0.015;
+        mouse.x += (mouse.tx - mouse.x) * 0.1;
+        mouse.y += (mouse.ty - mouse.y) * 0.1;
+
+        ctx.clearRect(0, 0, width, height);
+
+        const isDark = document.documentElement.classList.contains("dark");
+
+        // Tighter cell step for a dense, richly woven ASCII fabric
+        const cellW = width < 640 ? 9 : 10.5;
+        const cellH = width < 640 ? 11 : 12.5;
+        const cols = Math.ceil(width / cellW);
+        const rows = Math.ceil(height / cellH);
+
+        ctx.font = width < 640 ? "9.5px 'IBM Plex Mono', monospace" : "10.5px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Fade wave intensity gracefully as user scrolls past hero
+        const scrollFade = Math.max(0, 1 - window.scrollY / (height * 0.85));
+        if (scrollFade <= 0.01) {
+          requestAnimationFrame(animate);
+          return;
+        }
+
+        for (let r = 0; r < rows; r++) {
+          const py = r * cellH + cellH * 0.5;
+          for (let c = 0; c < cols; c++) {
+            const px = c * cellW + cellW * 0.5;
+
+            // Organic multi-layered fluid wave field
+            const nx = c * 0.042;
+            const ny = r * 0.056;
+            let wave =
+              Math.sin(nx + time) * 0.48 +
+              Math.cos(ny - time * 0.85) * 0.36 +
+              Math.sin((nx + ny) * 0.75 + time * 0.65) * 0.34;
+
+            // Interactive cursor ripple distortion & luminosity boost
+            const dx = px - mouse.x;
+            const dy = py - mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            let cursorBoost = 0;
+            if (dist < 240) {
+              const pull = 1 - dist / 240;
+              wave += Math.sin(dist * 0.055 - time * 3.8) * pull * 1.05;
+              cursorBoost = pull * pull;
+            }
+
+            const norm = Math.max(0, Math.min(1, (wave + 1.05) / 2.1));
+            const charIdx = Math.floor(norm * (ramp.length - 1));
+            const ch = ramp[charIdx];
+
+            if (ch !== " ") {
+              if (isDark) {
+                // Bright silver-gray wave crests up to crisp white near cursor
+                const lum = Math.min(255, Math.round(225 + norm * 30 + cursorBoost * 30));
+                const baseAlpha = 0.24 + norm * 0.44;
+                const alpha = Math.min(0.92, baseAlpha + cursorBoost * 0.32) * scrollFade;
+                ctx.fillStyle = `rgba(${lum}, ${lum}, ${lum}, ${alpha.toFixed(3)})`;
+              } else {
+                // Crisp high-contrast charcoal/ink in light mode
+                const baseAlpha = 0.22 + norm * 0.43;
+                const alpha = Math.min(0.88, baseAlpha + cursorBoost * 0.3) * scrollFade;
+                ctx.fillStyle = `rgba(17, 17, 17, ${alpha.toFixed(3)})`;
+              }
+              ctx.fillText(ch, px, py);
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    })();
+
+    // Subtle Ambient ASCII Waveform in About Section
+    (function initAboutAscii() {
+      const canvas = document.getElementById("about-ascii-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      let t = 0;
+
+      function loop() {
+        t += 0.025;
+        const rect = canvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = rect.width || 320;
+        const h = rect.height || 176;
+        if (canvas.width !== Math.floor(w * dpr)) {
+          canvas.width = w * dpr;
+          canvas.height = h * dpr;
+        }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+
+        const isDark = document.documentElement.classList.contains("dark");
+        const rgb = isDark ? "245, 245, 245" : "17, 17, 17";
+        ctx.font = "10px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "center";
+
+        const glyphs = " .·:;+=xX$#@&%";
+        const cols = Math.floor(w / 9);
+        const rows = Math.floor(h / 11);
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const v = Math.sin(c * 0.16 + t) * Math.cos(r * 0.24 - t * 0.7);
+            const norm = (v + 1) / 2;
+            const ch = glyphs[Math.floor(norm * (glyphs.length - 1))];
+            if (ch !== " ") {
+              ctx.fillStyle = `rgba(${rgb}, ${(0.22 + norm * 0.48).toFixed(2)})`;
+              ctx.fillText(ch, c * 9 + 5, r * 11 + 7);
+            }
+          }
+        }
+        requestAnimationFrame(loop);
+      }
+      loop();
+    })();
+
+    // =========================================================================
+    // 6. SUBTLE CHARACTER ROLL ON HOVER & CUSTOM DOT CURSOR
+    // =========================================================================
+    const GLYPHS = "abcdefghijklmnopqrstuvwxyz0123456789/+-";
+    document.addEventListener("mouseover", (e) => {
+      const el = e.target.closest(".scramble");
+      if (!el || el.dataset.busy === "1") return;
+      const orig = el.textContent;
+      el.dataset.busy = "1";
+      let step = 0;
+      const timer = setInterval(() => {
+        el.textContent = orig
+          .split("")
+          .map((ch, idx) => {
+            if (ch === " " || ch === "↗") return ch;
+            if (idx < step) return orig[idx];
+            return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+          })
+          .join("");
+        step += 0.6;
+        if (step >= orig.length) {
+          clearInterval(timer);
+          el.textContent = orig;
+          el.dataset.busy = "0";
+        }
+      }, 24);
+    });
+
+    // Custom Micro Cursor
+    const cursorDot = document.getElementById("cursor-dot");
+    const cursorLabel = document.getElementById("cursor-label");
+    window.addEventListener("mousemove", (e) => {
+      cursorDot.style.left = `${e.clientX}px`;
+      cursorDot.style.top = `${e.clientY}px`;
+      cursorDot.classList.remove("opacity-0");
+
+      const target = e.target.closest("[data-cursor]");
+      cursorLabel.textContent = target ? target.getAttribute("data-cursor") : "";
+    });
+
+    // =========================================================================
+    // 7. SCROLL REVEAL, COPY EMAIL & FORM
+    // =========================================================================
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add("visible");
+        });
+      },
+      { threshold: 0.08 }
+    );
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-text").textContent = msg;
+      toast.classList.remove("opacity-0", "translate-y-2");
+      setTimeout(() => toast.classList.add("opacity-0", "translate-y-2"), 2500);
+    }
+
+    document.getElementById("copy-email").addEventListener("click", () => {
+      const tmp = document.createElement("input");
+      tmp.value = "daianaarapbekova@gmail.com";
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand("copy");
+      document.body.removeChild(tmp);
+      showToast(CONTENT[lang].toast_copied);
+    });
+
+    document.getElementById("contact-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fb = document.getElementById("form-feedback");
+      const form = e.currentTarget;
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      fb.textContent = CONTENT[lang].form_sending;
+      fb.classList.remove("hidden");
+      try {
+        const response = await fetch("https://formsubmit.co/ajax/daianaarapbekova@gmail.com", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            name: form.elements.name.value,
+            _replyto: form.elements._replyto.value,
+            message: form.elements.message.value,
+            _subject: "New portfolio contact message"
+          })
+        });
+        const result = await response.json();
+        if (!response.ok || result.success === "false") throw new Error("Form submission failed");
+        fb.textContent = CONTENT[lang].form_sent;
+        form.reset();
+      } catch (error) {
+        fb.textContent = CONTENT[lang].form_error;
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+
+    // Init
+    window.addEventListener("DOMContentLoaded", updateTexts);
+    window.addEventListener("resize", () => {
+      GAMEDEV_WORK.forEach((p) => {
+        const c = document.getElementById(`gd-media-${p.id}`);
+        if (c) renderProjectMedia(c, p.assets[0], p.title[lang]);
+      });
+    });
+  </script>
+</body>
+</html>
