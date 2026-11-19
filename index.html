@@ -30,6 +30,7 @@
       --fg: #141414;
       --fg-muted: #6E6E6E;
       --fg-subtle: #9A9994;
+      --hero-meta: #555550;
       --border: rgba(20, 20, 20, 0.11);
       --border-hover: rgba(20, 20, 20, 0.35);
       --ascii-rgb: 20, 20, 20;
@@ -41,6 +42,7 @@
       --fg: #EBEBEB;
       --fg-muted: #888888;
       --fg-subtle: #4D4D4D;
+      --hero-meta: #B8B8B8;
       --border: rgba(255, 255, 255, 0.09);
       --border-hover: rgba(255, 255, 255, 0.32);
       --ascii-rgb: 235, 235, 235;
@@ -83,6 +85,18 @@
 
     .text-subtle {
       color: var(--fg-subtle);
+    }
+
+    .hero-meta {
+      color: var(--hero-meta);
+      font-weight: 400;
+      text-shadow: 0 1px 8px var(--bg);
+    }
+
+    .hero-role {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
     }
 
     .mono-meta {
@@ -255,14 +269,14 @@
     <canvas id="hero-ascii-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-95"></canvas>
 
     <!-- Top Micro Metadata -->
-    <div class="relative z-10 flex justify-between items-center mono-meta text-[10px] text-muted pt-2">
+    <div class="relative z-10 flex justify-between items-center mono-meta text-[11px] hero-meta pt-2">
       <span data-i18n="hero_index">00 — INDEX / PORTFOLIO</span>
       <span class="hidden sm:inline">51.1694° N, 71.4491° E</span>
     </div>
 
     <!-- Center Editorial Statement -->
     <div class="relative z-10 my-auto py-16 sm:py-24 max-w-4xl">
-      <p class="mono-meta text-muted mb-6" data-i18n="hero_role">
+      <p class="mono-meta hero-meta hero-role mb-6" data-i18n="hero_role">
         BACKEND ENGINEER &amp; GAME DEVELOPER
       </p>
       <h1 class="text-3xl sm:text-5xl md:text-[56px] font-light tracking-[-0.03em] leading-[1.12] mb-8" data-i18n="hero_headline">
@@ -282,7 +296,7 @@
     </div>
 
     <!-- Bottom Hero Metadata Bar -->
-    <div class="relative z-10 pt-6 border-t hairline flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mono-meta text-[10px] text-muted">
+    <div class="relative z-10 pt-6 border-t hairline flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mono-meta text-[11px] hero-meta">
       <div data-i18n="hero_current">CURRENTLY — IT AUTOMATION @ КАР TECHNOLOGY</div>
       <div class="flex items-center gap-6">
         <span data-i18n="hero_based">BASED IN ASTANA, KZ</span>
