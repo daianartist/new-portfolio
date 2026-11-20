@@ -416,7 +416,7 @@
               </div>
               <div>
                 <div class="mono-meta text-muted mb-5" data-i18n="cert_label">CERTIFICATIONS</div>
-                <div id="cert-container" class="space-y-5"></div>
+                <div id="cert-container" class="space-y-3"></div>
               </div>
             </div>
 
@@ -769,18 +769,14 @@
     ];
 
     const CERTIFICATIONS = [
-      {
-        org: "Alem School",
-        title: { en: "Backend Development in Go (1-Year Program)", ru: "Бэкенд-разработка на Go (годовая программа)" }
-      },
-      {
-        org: "OMNIUM",
-        title: { en: "GAMEDEV TEAMS Incubation Program", ru: "Инкубационная программа GAMEDEV TEAMS" }
-      },
-      {
-        org: "1C Kazakhstan",
-        title: { en: "1C:Enterprise 8 Programming", ru: "Программирование в 1С:Предприятие 8" }
-      }
+      { org: "Alem School", title: { en: "Backend Development in Go (1-Year Program)", ru: "Бэкенд-разработка на Go (годовая программа)" }, image: "assets/cert/Backend go development.jpeg" },
+      { org: "OMNIUM", title: { en: "GAMEDEV TEAMS Incubation Program", ru: "Инкубационная программа GAMEDEV TEAMS" }, image: "assets/cert/Инкубационная программа GAMEDEV TEAMS [PIPELINE 3.0].jpeg" },
+      { org: "Game Development Demo Day", title: { en: "Certificate of Achievement", ru: "Сертификат участника" }, image: "assets/cert/Certificate of Achievement – Game Development Demo Day1.jpeg" },
+      { org: "Game Development Demo Day", title: { en: "Certificate of Achievement", ru: "Сертификат участника" }, image: "assets/cert/Certificate of Achievement – Game Development Demo Day2.jpeg" },
+      { org: "1C Kazakhstan", title: { en: "1C:Enterprise 8 Configuration", ru: "Конфигурирование в 1С:Предприятие 8" }, image: "assets/cert/Введение в конфигурирование в системе \"1С- Предприятие 8.3. Основные объекты\".jpeg" },
+      { org: "1C Kazakhstan", title: { en: "1C:Enterprise 8 Programming", ru: "Программирование в 1С:Предприятие 8" }, image: "assets/cert/Азы программирования в системе \"1С-Предприятие 8.3\".jpeg" },
+      { org: "1C Kazakhstan", title: { en: "1C Programmer Training & Employment Program", ru: "Программа обучения и трудоустройства 1С-программистов" }, image: "assets/cert/Участие в проекте- 1С-Программист. Программа по обучению и трудоустройству студентов\".jpeg" },
+      { org: "Stepik", title: { en: "JavaScript Certificate", ru: "Сертификат по JavaScript" }, image: "assets/cert/ Сертификат по JavaScript на Stepik.jpeg" }
     ];
 
     const SKILLS = [
@@ -1013,10 +1009,16 @@
 
       // Certifications
       document.getElementById("cert-container").innerHTML = CERTIFICATIONS.map((c) => `
-        <div class="space-y-0.5">
-          <div class="mono-meta text-[10px] text-subtle">${c.org}</div>
-          <div class="text-sm font-light">${c.title[lang]}</div>
-        </div>
+        <a href="${encodeURI(c.image)}" target="_blank" rel="noopener" class="group flex items-center gap-3 border hairline bg-elevated/40 p-2.5 transition-colors hover:border-current hover:bg-elevated">
+          <div class="h-14 w-20 shrink-0 overflow-hidden border hairline bg-main">
+            <img src="${encodeURI(c.image)}" alt="" loading="lazy" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="mono-meta text-[9px] text-subtle">${c.org}</div>
+            <div class="mt-1 text-xs font-light leading-snug">${c.title[lang]}</div>
+          </div>
+          <span class="mono-meta text-[10px] text-muted transition-transform group-hover:translate-x-0.5" aria-hidden="true">↗</span>
+        </a>
       `).join("");
 
       // Skills
