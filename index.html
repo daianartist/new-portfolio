@@ -537,9 +537,9 @@
         backend_heading: "Selected Engineering Work",
         backend_hint: "SELECT A ROW TO INSPECT ARCHITECTURE",
         gamedev_heading: "GameDev, Rigging & Worlds",
-        filter_all: "ALL (04)",
+        filter_all: "ALL (08)",
         filter_games: "GAMES (03)",
-        filter_3d: "3D & RIGGING (01)",
+        filter_3d: "3D & RIGGING (05)",
         about_heading: "About",
         about_bio: "Computer Science undergraduate at Cardiff University Kazakhstan bridging distributed backend engineering (Go, Python) and interactive 3D game development (Unity, C#, Maya). Focused on clean architecture, fault-tolerant pipelines, and atmospheric visual storytelling.",
         exp_label: "EXPERIENCE",
@@ -576,9 +576,9 @@
         backend_heading: "Избранные Backend-проекты",
         backend_hint: "НАЖМИТЕ НА СТРОКУ ДЛЯ ПРОСМОТРА АРХИТЕКТУРЫ",
         gamedev_heading: "GameDev, риггинг и 3D-миры",
-        filter_all: "ВСЕ (04)",
+        filter_all: "ВСЕ (08)",
         filter_games: "ИГРЫ (03)",
-        filter_3d: "3D И РИГГИНГ (01)",
+        filter_3d: "3D И РИГГИНГ (05)",
         about_heading: "Обо мне",
         about_bio: "Студентка компьютерных наук Cardiff University Kazakhstan. Объединяю разработку распределённых бэкенд-систем (Go, Python) и создание интерактивных 3D-игр (Unity, C#, Maya). Фокусируюсь на чистой архитектуре, отказоустойчивости и визуальной выразительности.",
         exp_label: "ОПЫТ РАБОТЫ",
@@ -606,6 +606,22 @@
     const BACKEND_WORK = [
       {
         num: "01",
+        title: { en: "1337b04rd — Anonymous Imageboard", ru: "1337b04rd — анонимный имиджборд" },
+        stack: "Go · PostgreSQL · MinIO · Hexagonal Architecture",
+        year: "—",
+        github: "https://github.com/daianartist/1337b04rd",
+        desc: {
+          en: "Anonymous imageboard built in Go. Visitors receive a Rick and Morty character as a temporary identity and can publish image threads and comments without registration. PostgreSQL stores posts and sessions, MinIO stores images, and expired threads move to a read-only archive.",
+          ru: "Анонимный имиджборд на Go: посетители без регистрации публикуют треды с изображениями и комментарии, получая персонажа Rick and Morty как временный аватар. PostgreSQL хранит треды и сессии, MinIO — изображения; просроченные треды переходят в архив только для чтения."
+        },
+        asciiFlow: `HTTP Layer ──▶ Hexagonal Service ──▶ PostgreSQL
+                       │
+             MinIO Image Storage
+                       │
+             Expiring Threads → Archive`
+      },
+      {
+        num: "02",
         title: { en: "Ride Hail — Microservices Taxi Backend", ru: "Ride Hail — микросервисный бэкенд такси" },
         stack: "Go · PostgreSQL · PostGIS · RabbitMQ · WebSockets · JWT",
         year: "—",
@@ -614,7 +630,7 @@
         asciiFlow: "Ride API ──▶ RabbitMQ ──▶ Driver Matching\n    │                         │\n PostgreSQL + PostGIS ◀── WebSockets"
       },
       {
-        num: "02",
+        num: "03",
         title: { en: "Marketflow — Real-Time Market Data", ru: "Marketflow — обработка рыночных данных" },
         stack: "Go · PostgreSQL · Redis · Worker Pools · Hexagonal Architecture",
         year: "—",
@@ -623,7 +639,7 @@
         asciiFlow: "Exchange Streams ──▶ Worker Pools\n       │                 │\n     Redis ◀── Aggregation ──▶ PostgreSQL"
       },
       {
-        num: "03",
+        num: "04",
         title: { en: "Where’s My Pizza — Distributed Order System", ru: "Where’s My Pizza — распределённая система заказов" },
         stack: "Go · PostgreSQL · RabbitMQ · REST API",
         year: "—",
@@ -632,7 +648,7 @@
         asciiFlow: "HTTP Order API ──▶ PostgreSQL\n       │\n   RabbitMQ ──▶ Kitchen Worker ──▶ Notifications"
       },
       {
-        num: "04",
+        num: "05",
         title: { en: "Hot Coffee — Coffee Shop Management API", ru: "Hot Coffee — API управления кофейней" },
         stack: "Go · REST API · Layered Architecture · JSON",
         year: "—",
@@ -641,7 +657,7 @@
         asciiFlow: "REST API ──▶ Services ──▶ JSON Repositories\n                 │\n          Inventory Updates"
       },
       {
-        num: "05",
+        num: "06",
         title: { en: "RSSHub — RSS Feed Aggregator", ru: "RSSHub — агрегатор RSS-лент" },
         stack: "Go · PostgreSQL · Worker Pool · CLI",
         year: "—",
@@ -650,7 +666,7 @@
         asciiFlow: "RSS Feeds ──▶ Worker Pool ──▶ PostgreSQL\n                   ▲\n             CLI Controls"
       },
       {
-        num: "06",
+        num: "07",
         title: { en: "OwnRedis — In-Memory Key-Value Store", ru: "OwnRedis — хранилище ключ-значение в памяти" },
         stack: "Go · UDP · Concurrency · TTL",
         year: "—",
@@ -659,7 +675,7 @@
         asciiFlow: "UDP Clients ──▶ Command Handler ──▶ In-Memory Store\n                                      │\n                               Expiration Cleanup"
       },
       {
-        num: "07",
+        num: "08",
         title: { en: "triple-s — Simple Storage Service", ru: "triple-s — простое объектное хранилище" },
         stack: "Go · REST API · File Storage · S3-like",
         year: "—",
@@ -668,7 +684,7 @@
         asciiFlow: "REST API ──▶ Bucket / Object Operations ──▶ Disk\n                         │\n                   CSV Metadata"
       },
       {
-        num: "08",
+        num: "09",
         title: { en: "CreditCard — Card Utility CLI", ru: "CreditCard — CLI для банковских карт" },
         stack: "Go · CLI · Luhn Algorithm",
         year: "—",
@@ -677,7 +693,7 @@
         asciiFlow: "Arguments / stdin ──▶ Luhn & Card Data\n                           │\n              Validate · Generate · Inspect · Issue"
       },
       {
-        num: "09",
+        num: "10",
         title: { en: "Markov Chain Text Generator", ru: "Генератор текста на цепях Маркова" },
         stack: "Go · CLI · Markov Chains",
         year: "—",
@@ -686,7 +702,7 @@
         asciiFlow: "Text Input ──▶ Markov State Table ──▶ Generated Text\n                      ▲\n             Prefix / Length Options"
       },
       {
-        num: "10",
+        num: "11",
         title: { en: "CSV Parser — A Library for Others", ru: "CSV Parser — библиотека для чтения CSV" },
         stack: "Go · io.Reader · CSV Parsing",
         year: "—",
@@ -695,13 +711,34 @@
         asciiFlow: "io.Reader ──▶ Line Parser ──▶ CSV Fields\n                    └──────▶ ErrQuote"
       },
       {
-        num: "11",
+        num: "12",
         title: { en: "Bitmap — Image Processing CLI", ru: "Bitmap — CLI для обработки изображений" },
         stack: "Go · CLI · BMP",
         year: "—",
         github: "https://github.com/daianartist/bit-map",
         desc: { en: "Command-line BMP tool for reading image headers and applying transformations: mirroring, rotation, cropping, and sequential color filters. Supports uncompressed 24-bit BMP files.", ru: "CLI-инструмент для просмотра заголовков BMP и преобразований: отражения, поворота, обрезки и последовательного применения цветовых фильтров. Поддерживает несжатые BMP 24 bit." },
         asciiFlow: "BMP File ──▶ Header / Transform Pipeline ──▶ BMP Output\n                 Mirror · Rotate · Crop · Filters"
+      },
+      {
+        num: "13",
+        title: { en: "Attendance Control Platform", ru: "Платформа контроля посещаемости" },
+        stack: "C# · .NET MAUI · Python (Flask) · PostgreSQL · QR · Geofencing",
+        year: "2024–25",
+        images: [
+          "assets/Attendance Control, копия, копия.png",
+          "assets/Attendance Control, копия, копия-2.png",
+          "assets/Attendance Control, копия, копия-3.png",
+          "assets/Attendance Control, копия, копия-4.png"
+        ],
+        desc: {
+          en: "Campus attendance platform for 900+ users, combining QR check-ins, geofencing validation around campus, a cross-platform .NET MAUI mobile app, and an administrative analytics dashboard.",
+          ru: "Платформа учёта посещаемости для кампуса на 900+ пользователей: QR-отметки, проверка геозоны кампуса, кроссплатформенное мобильное приложение на .NET MAUI и аналитическая панель администратора."
+        },
+        asciiFlow: ` .NET MAUI App ──▶ Flask API ──▶ PostgreSQL
+    QR + GPS          │
+               Geofence Validation
+                      │
+             Admin Analytics Dashboard`
       }
     ];
 
@@ -738,7 +775,7 @@
           ru: "Трёхмерная фэнтези-головоломка на Unity (механика 3D-тетриса) с пространственной логикой, физикой взаимодействий и низкополигональной стилизацией."
         },
         githubUrl: "https://github.com/daianartist/onceuponabox",
-        assets: ["Game-once upon a box-gameplay.jpg", "once upon a box.jpg", "tutor.jpg", "tutor2.jpg", "3dmodels-once upon a box-props.jpg"],
+        assets: ["Game-once upon a box-gameplay.jpg", "once upon a box.jpg", "tutor.jpg", "tutor2.jpg"],
         visualType: "iso-blocks"
       },
       {
@@ -762,25 +799,79 @@
         visualType: "altai-contours"
       },
       {
-        id: "rigging-3d",
+        id: "trash-bin-rig",
         num: "04",
         category: "3d",
-        subtitle: { en: "CHARACTER & PROP RIGGING", ru: "РИГГИНГ И 3D-АНИМАЦИЯ" },
-        title: { en: "3D Modeling, Rigging & Animation", ru: "3D-моделирование и риггинг" },
-        stack: ["Autodesk Maya", "Substance 3D", "IK/FK Rigging", "Animation"],
+        subtitle: { en: "MECHANICAL PROP RIGGING", ru: "РИГГИНГ МЕХАНИЧЕСКОГО ПРОПСА" },
+        title: { en: "Trash Bin — Modeling & Rigging", ru: "Мусорный бак — моделирование и риггинг" },
+        stack: ["Autodesk Maya", "Modeling", "Rigging", "Animation"],
         desc: {
-          en: "Custom skeletal rigging for characters and props (including an articulated human-cat hybrid rig and mechanical prop rigs), PBR texturing, and keyframe animation.",
-          ru: "Создание скелетных ригов персонажей и пропсов (гибридный риг человека-кошки и механические риги), PBR-текстурирование в Substance 3D и анимация."
+          en: "Modeled and rigged a mechanical trash bin prop, with its rendered model, UV layout, rig controls, and animation showcase.",
+          ru: "Моделирование и риггинг механического мусорного бака: модель, UV-развёртка, контроллеры рига и демонстрация анимации."
         },
         assets: [
+          "3dModelAnimationTrashBin.mov",
           "trashBinRender.jpg",
-          "3d-models-props.png",
-          "rig-human_cat.png",
-          " rig-human-cat2.png",
-          "rig-human-cat3.png",
-          "rig-trash-bin.png",
-          "3dModelAnimationTrashBin.mov"
+          "trashmodel.png",
+          "trashuv.png",
+          "rig-trash-bin.png"
         ],
+        visualType: "kinematics"
+      },
+      {
+        id: "robot-rig",
+        num: "05",
+        category: "3d",
+        subtitle: { en: "CHARACTER MODEL & ANIMATION", ru: "МОДЕЛЬ ПЕРСОНАЖА И АНИМАЦИЯ" },
+        title: { en: "Robot — Modeling & Animation", ru: "Робот — моделирование и анимация" },
+        stack: ["Autodesk Maya", "Modeling", "Rigging", "Animation"],
+        desc: {
+          en: "Stylized robot character modeling, rigging, and animation, with model renders and animation clips.",
+          ru: "Моделирование, риггинг и анимация стилизованного персонажа-робота; в галерее — рендеры модели и видео анимации."
+        },
+        assets: ["3d-robot-model.jpg", "robotmodel.png", "robotani.avi", "robo_atack.avi"],
+        visualType: "kinematics"
+      },
+      {
+        id: "cat-rig",
+        num: "06",
+        category: "3d",
+        subtitle: { en: "CHARACTER RIGGING & ANIMATION", ru: "РИГГИНГ И АНИМАЦИЯ ПЕРСОНАЖА" },
+        title: { en: "Cat Character — Model & Rig", ru: "Персонаж-кот — модель и риг" },
+        stack: ["Autodesk Maya", "Character Modeling", "Rigging", "Animation"],
+        desc: {
+          en: "Character modeling and skeletal rigging for an articulated human-cat character, with UVs and walk/run animation clips.",
+          ru: "Моделирование и скелетный риг персонажа-кота с подвижными суставами, UV-развёрткой и анимациями ходьбы и бега."
+        },
+        assets: ["catmodel.png", "rig-human_cat.png", " rig-human-cat2.png", "rig-human-cat3.png", "catuv.png", "catWalk.avi", "catRun.avi"],
+        visualType: "kinematics"
+      },
+      {
+        id: "props-modeling",
+        num: "07",
+        category: "3d",
+        subtitle: { en: "3D PROP MODELING", ru: "3D-МОДЕЛИРОВАНИЕ ПРОПСОВ" },
+        title: { en: "Props — Modeling & Texturing", ru: "Пропсы — моделирование и текстурирование" },
+        stack: ["Autodesk Maya", "Substance 3D", "Modeling", "Texturing"],
+        desc: {
+          en: "A collection of stylized environment props and their modeling and texture sheet presentations.",
+          ru: "Коллекция стилизованных объектов окружения с демонстрацией моделей и текстурных листов."
+        },
+        assets: ["3d-models-props.png", "props.png"],
+        visualType: "kinematics"
+      },
+      {
+        id: "once-upon-a-box-props",
+        num: "08",
+        category: "3d",
+        subtitle: { en: "GAME PROPS · ONCE UPON A BOX", ru: "ИГРОВЫЕ ПРОПСЫ · ONCE UPON A BOX" },
+        title: { en: "Once Upon a Box — Props", ru: "Once Upon a Box — пропсы" },
+        stack: ["Autodesk Maya", "Game Props", "3D Modeling"],
+        desc: {
+          en: "A collection of modeled props created for the Once Upon a Box game.",
+          ru: "Коллекция 3D-пропсов, созданных для игры Once Upon a Box."
+        },
+        assets: ["3dmodels-once upon a box-props.jpg"],
         visualType: "kinematics"
       }
     ];
@@ -969,6 +1060,15 @@
                 <div class="lg:col-span-6">
                   <pre class="font-mono text-[11px] leading-relaxed text-muted border hairline p-4 bg-elevated/40 overflow-x-auto">${item.asciiFlow}</pre>
                 </div>
+                ${item.images ? `
+                  <div class="lg:col-span-10 lg:col-start-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    ${item.images.map((image, index) => `
+                      <a href="${encodeURI(image)}" target="_blank" rel="noopener noreferrer" class="block overflow-hidden border hairline bg-elevated" aria-label="${item.title[lang]} — screenshot ${index + 1}">
+                        <img src="${encodeURI(image)}" alt="${item.title[lang]} — screenshot ${index + 1}" loading="lazy" class="w-full h-auto transition-transform duration-300 hover:scale-[1.02]" />
+                      </a>
+                    `).join("")}
+                  </div>
+                ` : ""}
               </div>
             </div>
           </div>
@@ -1096,8 +1196,8 @@
     function renderProjectMedia(container, filename, alt) {
       if (!container) return;
       const src = `assets/${encodeURIComponent(filename)}`;
-      container.innerHTML = /\.mov$/i.test(filename)
-        ? `<video class="w-full h-full object-contain bg-black" src="${src}" controls playsinline preload="metadata" aria-label="${alt}"></video>`
+      container.innerHTML = /\.(mov|avi)$/i.test(filename)
+        ? `<video class="w-full h-full object-contain bg-black" src="${src}" autoplay muted loop controls playsinline preload="metadata" aria-label="${alt}"></video>`
         : `<img class="w-full h-full object-contain" src="${src}" alt="${alt}" loading="lazy" />`;
     }
 
